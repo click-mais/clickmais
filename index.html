@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Click+ | Experience Elite v156</title>
+    <title>Click+ | Experience Elite v157</title>
     <script>
 /* Minimal Tailwind-equivalent utilities for elite splash */
 </script>
@@ -1123,7 +1123,20 @@ function _loadApp(cb) {
         window._blobAppUrl = URL.createObjectURL(blob);
         fr.src = window._blobAppUrl;
       })
-      .catch(function(){ fr.src = _APP_DATA_URL; });
+      .catch(function(){
+      /* Fetch of data: URL failed (Android Chrome) — build blob manually */
+      try {
+        var _b64 = _APP_DATA_URL.split('base64,')[1];
+        var _bin = atob(_b64);
+        var _arr = new Uint8Array(_bin.length);
+        for (var _i = 0; _i < _bin.length; _i++) _arr[_i] = _bin.charCodeAt(_i);
+        var _blob = new Blob([_arr], {type:'text/html'});
+        window._blobAppUrl = URL.createObjectURL(_blob);
+        fr.src = window._blobAppUrl;
+      } catch(_e) {
+        fr.src = _APP_DATA_URL; /* last resort */
+      }
+    });
   } else {
     fr.src = _APP_DATA_URL;
   }
